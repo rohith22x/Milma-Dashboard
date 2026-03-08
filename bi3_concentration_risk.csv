@@ -1,0 +1,47 @@
+Category,Product,Total_Revenue,Revenue_Share_Pct,Cumulative_Share_Pct,Concentration_Flag,Risk_Score
+Ghee,Ghee 500ml Pet,421421157.86,25.463,25.46,CRITICAL,10
+Ghee,Ghee 15kg Tin,351682918.37,21.2493,46.71,CRITICAL,10
+Ghee,Ghee 200ml Pet,225747376.08,13.64,60.35,CRITICAL,9
+Ghee,Ghee 1 Ltr Pet,156044782.89,9.4285,69.78,HIGH,8
+Ghee,Ghee 100ml Botls,130949596.95,7.9122,77.69,HIGH,8
+Ghee,Ghee 5ltr Jar,96292456.47,5.8182,83.51,HIGH,7
+Ghee,Ok Ghee 50ml,78819687.38,4.7624,88.27,LOW,6
+Ghee,Ghee 50ml Pet,56287650.59,3.401,91.67,LOW,6
+Palada,Palada Mix 200gm,46748208.78,2.8246,94.5,LOW,5
+UHT Milk,Uht Milk 500ml,14575629.51,0.8807,95.38,LOW,3
+Butter,Desi Cooking Butter 500gm(Carton),11259504.65,0.6803,96.06,LOW,3
+UHT Milk,Uht Milk 450ml,10920412.11,0.6598,96.72,LOW,3
+Butter,Butter Bulk 20kg,9222213.82,0.5572,97.28,LOW,3
+Palada,Instant Semiya Mix 250gm,7242495.32,0.4376,97.71,LOW,2
+Butter,Desi Cooking Butter 100gm(Tub),6121141.29,0.3698,98.08,LOW,2
+Milk Powder,Day To Day Dairy Whitener - 500 G,5290548.64,0.3197,98.4,LOW,2
+Milk Powder,Day To Day Dairy Whitener - 200 G,3649040.87,0.2205,98.62,LOW,2
+Ghee,Ghee Bulk,3364500.17,0.2033,98.83,LOW,2
+Butter,Desi Cooking Butter 200g(Tub),3169284.8,0.1915,99.02,LOW,2
+Ghee,Biriyani Ghee 500ml Pet,2837208.51,0.1714,99.19,LOW,2
+Palada,Palada Pradhaman 200g,2096519.4100000001,0.1267,99.32,LOW,2
+Ghee,Biriyani Ghee 200ml Pet,1985268.4500000002,0.12,99.44,LOW,2
+Ghee,Biriyani Ghee 100ml Pet,1657215.03,0.1001,99.54,LOW,2
+Ghee,Biriyani Ghee 1 Ltr Pet,1143152.73,0.0691,99.61,LOW,2
+Ghee,Ghee 2 Ltr Tin,769744.73,0.0465,99.65,LOW,2
+Instant Mixes,Dairy Fresh Vegitable Biriyani 250g,740714.36,0.0448,99.7,LOW,2
+Instant Mixes,Instant Butter Idiyappam,687717.8099999999,0.0416,99.74,LOW,2
+Milk Powder,Day To Day Dairy Whitener - 20 G,668537.45,0.0404,99.78,LOW,2
+Palada,Ready To Drink Palada 400g,589470.46,0.0356,99.82,LOW,2
+Palada,Palada - Instant Wheat Ada Mix 250g,523881.95,0.0317,99.85,LOW,2
+UHT Milk,Uht Toned Milk 1000 Ml (Tetra Pack),479812.5,0.029,99.88,LOW,2
+UHT Milk,Uht Milk Double Toned 450 Ml,470933.89,0.0285,99.91,LOW,2
+Instant Mixes,Instant Paneer Butter Masala Mix-270g,366182.4,0.0221,99.93,LOW,2
+Milk Powder,Day To Day Dairy Whitener - 900 G,349328.25,0.0211,99.95,LOW,2
+Instant Mixes,Instant Ghee Upma,343298.81,0.0207,99.97,LOW,2
+UHT Milk,D'Lite Milk 180 Ml,186978.32,0.0113,99.98,LOW,2
+Ghee,Biriyani Ghee 5 Ltr Jar,111773.47,0.0068,99.99,LOW,2
+UHT Milk,Uht Toned Milk 500 Ml (Tetra Pack),90028.35,0.0054,99.99,LOW,2
+Palada,Instant Jackfruit Payasam Mix 250g,34046.770000000004,0.0021,99.99,LOW,2
+Instant Mixes,Instant Pulissery Mix - 100g,32958.7,0.002,100.0,LOW,2
+Butter,Desi Cooking Butter 50g(Tub),21903.21,0.0013,100.0,LOW,2
+Milk Powder,Day To Day Dairy Whitener - 1 Kg,11773.44,0.0007,100.0,LOW,2
+Milk Powder,Day To Day Dairy Whitener - 10 Kg Bag,11037.599999999999,0.0007,100.0,LOW,2
+Butter,Table Butter 200gm Salted(Carton),8494.79,0.0005,100.0,LOW,2
+Butter,Table Butter 100gm Salted,5892.26,0.0004,100.0,LOW,2
+Milk Powder,Day To Day Dairy Whitener - 100 G,2175.02,0.0001,100.0,LOW,2

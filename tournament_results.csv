@@ -1,0 +1,7 @@
+Category,Prophet_MAPE,XGBoost_MAPE,Champion,Champion_MAPE,Quality
+Butter,116.06,27.49,XGBoost,27.49,Acceptable
+Ghee,16.04,12.07,XGBoost,12.07,Excellent
+Instant Mixes,98.09,76.52,XGBoost,76.52,Poor
+Milk Powder,256.33,206.46,XGBoost,206.46,Poor
+Palada,52.82,19.76,XGBoost,19.76,Excellent
+UHT Milk,133.07,168.11,Prophet,133.07,Poor
