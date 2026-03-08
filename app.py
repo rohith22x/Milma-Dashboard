@@ -237,33 +237,37 @@ st.markdown(f"""
   }}
   section[data-testid="stSidebar"] * {{ color: #CBD5E1 !important; }}
 
-  /* Style sidebar buttons as nav items */
+  /* Nav row: relative container holding the visual face + the invisible button */
+  .nav-row {{ position: relative; }}
+
+  /* The visual label (icon + text) sits in normal flow */
+  .nav-face {{ border-radius: 6px; transition: background .15s; }}
+  .nav-row:hover .nav-face {{ background: #1E293B; }}
+
+  /* The st.button sits in the same row but is made invisible.
+     We pull it up by its own height so it overlaps the .nav-face above. */
+  section[data-testid="stSidebar"] .stButton {{
+    margin-top: -36px !important;   /* pull button up over the .nav-face div */
+    position: relative;
+    z-index: 2;
+  }}
   section[data-testid="stSidebar"] .stButton button {{
     background: transparent !important;
     border: none !important;
-    border-radius: 6px !important;
-    color: #94A3B8 !important;
-    font-size: .87em !important;
-    font-weight: 400 !important;
-    padding: 8px 12px !important;
-    text-align: left !important;
-    width: 100% !important;
+    color: transparent !important;
     box-shadow: none !important;
-    transition: background .15s !important;
+    height: 36px !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    width: 100% !important;
+    font-size: 1px !important;
   }}
-  section[data-testid="stSidebar"] .stButton button:hover {{
-    background: #1E293B !important;
-    color: #F1F5F9 !important;
-  }}
+  section[data-testid="stSidebar"] .stButton button:hover,
   section[data-testid="stSidebar"] .stButton button:focus {{
+    background: transparent !important;
+    border: none !important;
     box-shadow: none !important;
     outline: none !important;
-  }}
-  /* Active nav button — highlight the currently selected page */
-  section[data-testid="stSidebar"] div.nav-btn-wrap[style*="background:#1E3A5F"] .stButton button {{
-    background: #1E3A5F !important;
-    color: #93C5FD !important;
-    font-weight: 600 !important;
   }}
 
   /* Header */
@@ -539,27 +543,31 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     for key in PAGE_KEYS:
-        is_active = (st.session_state.page == key)
-        icon_svg  = PAGE_ICONS[key](size=15,
-                        color="#93C5FD" if is_active else "#64748B")
+        is_active   = (st.session_state.page == key)
+        icon_svg    = PAGE_ICONS[key](size=15, color="#93C5FD" if is_active else "#64748B")
         label_color = "#93C5FD" if is_active else "#94A3B8"
-        bg_style    = "background:#1E3A5F;" if is_active else ""
-        fw_style    = "font-weight:600;" if is_active else ""
+        bg          = "background:#1E3A5F;" if is_active else ""
+        fw          = "font-weight:600;" if is_active else ""
 
-        # Render icon + label as the button face via markdown trick:
-        # wrap in a container div for styling, use st.button for interactivity
-        st.markdown(
-            f"<div class='nav-btn-wrap' style='{bg_style}border-radius:6px;"
-            f"margin:1px 4px;'>",
-            unsafe_allow_html=True)
-        if st.button(
-            f"{key}",
-            key=f"nav_{key}",
-            use_container_width=True,
-        ):
+        # Render the visual label (SVG + text) ABOVE the button in a relative container.
+        # CSS makes the button fill the container and sit on top (pointer-events),
+        # while the label div is overlaid visually but lets clicks pass through.
+        unique_id = key.replace(" ", "_").replace("—", "").replace("  ", "_")
+        st.markdown(f"""
+        <div class="nav-row" id="nav_{unique_id}"
+             style="position:relative;{bg}border-radius:6px;margin:1px 4px;">
+          <div class="nav-face" style="display:flex;align-items:center;gap:9px;
+               padding:8px 12px;pointer-events:none;position:relative;z-index:1;">
+            {icon_svg}
+            <span style="font-size:.87em;{label_color and f'color:{label_color};'}{fw}">
+              {key}
+            </span>
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("‎", key=f"nav_{key}", use_container_width=True):  # zero-width label
             st.session_state.page = key
             st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("""
     <hr style='border:none;border-top:1px solid #1E293B;margin:10px 0;'>
@@ -1370,3 +1378,4 @@ elif page == "Category Deep Dive":
                            yaxis=dict(tickfont=dict(size=10)),
                            margin=dict(l=10, r=70, t=10, b=10))
         st.plotly_chart(fig3, use_container_width=True)
+
