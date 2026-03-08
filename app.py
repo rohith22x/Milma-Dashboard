@@ -237,38 +237,34 @@ st.markdown(f"""
   }}
   section[data-testid="stSidebar"] * {{ color: #CBD5E1 !important; }}
 
-  /* Fully hide the native Streamlit radio widget — we render custom nav items */
-  section[data-testid="stSidebar"] .stRadio {{
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-    height: 0;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
+  /* Style sidebar buttons as nav items */
+  section[data-testid="stSidebar"] .stButton button {{
+    background: transparent !important;
+    border: none !important;
+    border-radius: 6px !important;
+    color: #94A3B8 !important;
+    font-size: .87em !important;
+    font-weight: 400 !important;
+    padding: 8px 12px !important;
+    text-align: left !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    transition: background .15s !important;
   }}
-
-  /* Custom nav item */
-  .nav-item {{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: .87em;
-    color: #94A3B8;
-    margin: 1px 8px;
-    transition: background .15s;
+  section[data-testid="stSidebar"] .stButton button:hover {{
+    background: #1E293B !important;
+    color: #F1F5F9 !important;
   }}
-  .nav-item:hover {{ background: #1E293B; color: #F1F5F9; }}
-  .nav-item.active {{
-    background: #1E3A5F;
+  section[data-testid="stSidebar"] .stButton button:focus {{
+    box-shadow: none !important;
+    outline: none !important;
+  }}
+  /* Active nav button — highlight the currently selected page */
+  section[data-testid="stSidebar"] div.nav-btn-wrap[style*="background:#1E3A5F"] .stButton button {{
+    background: #1E3A5F !important;
     color: #93C5FD !important;
-    font-weight: 600;
+    font-weight: 600 !important;
   }}
-  .nav-item svg {{ opacity: .75; }}
-  .nav-item.active svg {{ opacity: 1; }}
 
   /* Header */
   .dashboard-header {{
@@ -519,12 +515,15 @@ def load_data():
 master, clusters, tournament, forecast, bi3, bi7, recsys = load_data()
 
 
+# ── Session state for navigation ─────────────────────────────
+if "page" not in st.session_state:
+    st.session_state.page = "Executive Summary"
+
 # ── Sidebar ───────────────────────────────────────────────────
 with st.sidebar:
-    # Logo block
     milk_svg = icon_milk(size=18, color="#93C5FD")
     st.markdown(f"""
-    <div style='padding: 20px 16px 14px; display:flex; align-items:center; gap:10px;'>
+    <div style='padding:20px 16px 14px;display:flex;align-items:center;gap:10px;'>
       <div style='width:34px;height:34px;background:#1E3A5F;border-radius:8px;
                   display:flex;align-items:center;justify-content:center;flex-shrink:0;'>
         {milk_svg}
@@ -536,27 +535,34 @@ with st.sidebar:
           Demand Intelligence</div>
       </div>
     </div>
-    <hr style='border:none;border-top:1px solid #1E293B;margin:0 0 8px;'>
+    <hr style='border:none;border-top:1px solid #1E293B;margin:0 0 6px;'>
     """, unsafe_allow_html=True)
 
-    # Hidden radio for state management
-    page = st.radio("Navigation", PAGE_KEYS, label_visibility="collapsed")
-
-    # Render custom nav items with SVG icons
     for key in PAGE_KEYS:
-        is_active = (page == key)
+        is_active = (st.session_state.page == key)
         icon_svg  = PAGE_ICONS[key](size=15,
                         color="#93C5FD" if is_active else "#64748B")
-        cls = "nav-item active" if is_active else "nav-item"
-        st.markdown(
-            f"<div class='{cls}'>{icon_svg}"
-            f"<span style='color:{'#93C5FD' if is_active else '#94A3B8'};'>"
-            f"{key}</span></div>",
-            unsafe_allow_html=True)
+        label_color = "#93C5FD" if is_active else "#94A3B8"
+        bg_style    = "background:#1E3A5F;" if is_active else ""
+        fw_style    = "font-weight:600;" if is_active else ""
 
-    # Project info
+        # Render icon + label as the button face via markdown trick:
+        # wrap in a container div for styling, use st.button for interactivity
+        st.markdown(
+            f"<div class='nav-btn-wrap' style='{bg_style}border-radius:6px;"
+            f"margin:1px 4px;'>",
+            unsafe_allow_html=True)
+        if st.button(
+            f"{key}",
+            key=f"nav_{key}",
+            use_container_width=True,
+        ):
+            st.session_state.page = key
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+
     st.markdown("""
-    <hr style='border:none;border-top:1px solid #1E293B;margin:12px 0 10px;'>
+    <hr style='border:none;border-top:1px solid #1E293B;margin:10px 0;'>
     <div style='font-size:.72em;color:#475569;padding:0 16px 16px;line-height:2;'>
       <div style='color:#94A3B8;font-weight:600;margin-bottom:4px;font-size:.9em;
                   text-transform:uppercase;letter-spacing:.6px;'>Project Info</div>
@@ -567,6 +573,8 @@ with st.sidebar:
       28,284 transactions
     </div>
     """, unsafe_allow_html=True)
+
+page = st.session_state.page
 
 
 # ══════════════════════════════════════════════════════════════
