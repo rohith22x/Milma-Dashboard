@@ -236,13 +236,16 @@ st.markdown(f"""
     border-right: 1px solid #1E293B;
   }}
   section[data-testid="stSidebar"] * {{ color: #CBD5E1 !important; }}
-  section[data-testid="stSidebar"] .stRadio label {{
-    font-size: .88em;
-    padding: 4px 0;
-  }}
-  /* Hide default radio circles — we use custom nav items */
-  section[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] p {{
-    display: none;
+
+  /* Fully hide the native Streamlit radio widget — we render custom nav items */
+  section[data-testid="stSidebar"] .stRadio {{
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
   }}
 
   /* Custom nav item */
@@ -465,6 +468,36 @@ def chart_fmt(fig, height=360, show_legend=True):
     )
     return fig
 
+def fmt_pie(fig, height=300, center_text=""):
+    """
+    Clean donut chart: percent labels inside slices,
+    readable legend below, no outside scattered labels.
+    """
+    fig.update_traces(
+        textposition="inside",
+        textinfo="percent",
+        textfont=dict(size=11, color=CARD_BG),
+        insidetextorientation="radial",
+        marker=dict(line=dict(color=CARD_BG, width=2)))
+    layout = dict(
+        paper_bgcolor=CARD_BG,
+        height=height,
+        margin=dict(l=10, r=10, t=10, b=10),
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            y=-0.15, x=0.5, xanchor="center",
+            font=dict(size=11, color=TEXT_PRIMARY),
+            bgcolor=CARD_BG,
+            borderwidth=0))
+    if center_text:
+        layout["annotations"] = [dict(
+            text=center_text, x=0.5, y=0.5,
+            font_size=13, font_color=TEXT_PRIMARY,
+            showarrow=False)]
+    fig.update_layout(**layout)
+    return fig
+
 def hex_to_rgba(h, a=0.12):
     h = h.lstrip("#")
     r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
@@ -650,15 +683,8 @@ elif page == "Portfolio Overview":
         cat_rev = master.groupby("Category")["Sales_Value"].sum().reset_index()
         fig = px.pie(cat_rev, values="Sales_Value", names="Category", hole=0.55,
                      color="Category", color_discrete_map=CATEGORY_COLORS)
-        fig.update_traces(textposition="outside", textinfo="percent+label",
-                          textfont_size=12,
-                          marker=dict(line=dict(color=CARD_BG, width=2)))
-        fig.update_layout(
-            showlegend=False, paper_bgcolor=CARD_BG,
-            height=340, margin=dict(l=20, r=20, t=10, b=10),
-            annotations=[dict(text=f"<b>₹{total_rev/1e9:.2f}B</b><br>Total",
-                              x=0.5, y=0.5, font_size=14,
-                              font_color=TEXT_PRIMARY, showarrow=False)])
+        fmt_pie(fig, height=340,
+                center_text=f"<b>₹{total_rev/1e9:.2f}B</b><br>Total")
         st.plotly_chart(fig, use_container_width=True)
 
     with col2:
@@ -864,10 +890,7 @@ elif page == "Clustering Results":
         cl_rev = clusters.groupby("Cluster_Name")["Total_Revenue"].sum().reset_index()
         fig2 = px.pie(cl_rev, values="Total_Revenue", names="Cluster_Name", hole=0.5,
                       color="Cluster_Name", color_discrete_map=CLUSTER_COLORS)
-        fig2.update_traces(textposition="outside", textinfo="percent+label",
-                           textfont_size=12, marker=dict(line=dict(color=CARD_BG, width=2)))
-        fig2.update_layout(showlegend=False, paper_bgcolor=CARD_BG,
-            height=240, margin=dict(l=10, r=10, t=10, b=10))
+        fmt_pie(fig2, height=260)
         st.plotly_chart(fig2, use_container_width=True)
 
         create_section("Cluster Summary")
@@ -1048,10 +1071,7 @@ elif page == "Portfolio Risk":
         fc   = {"CRITICAL": DANGER, "HIGH": "#F97316", "MODERATE": WARNING, "LOW": PRIMARY}
         fig1 = px.pie(conc, values="Count", names="Flag", hole=0.5,
                       color="Flag", color_discrete_map=fc)
-        fig1.update_traces(textposition="outside", textinfo="percent+label",
-                           textfont_size=12, marker=dict(line=dict(color=CARD_BG, width=2)))
-        fig1.update_layout(showlegend=False, paper_bgcolor=CARD_BG,
-            height=280, margin=dict(l=20, r=20, t=10, b=10))
+        fmt_pie(fig1, height=300)
         st.plotly_chart(fig1, use_container_width=True)
 
     with col2:
@@ -1061,10 +1081,7 @@ elif page == "Portfolio Risk":
         rc  = {"GROWING": SUCCESS, "STABLE": "#0D9488", "RECOVERING": WARNING, "DISRUPTED": DANGER}
         fig2 = px.pie(rec, values="Count", names="Status", hole=0.5,
                       color="Status", color_discrete_map=rc)
-        fig2.update_traces(textposition="outside", textinfo="percent+label",
-                           textfont_size=12, marker=dict(line=dict(color=CARD_BG, width=2)))
-        fig2.update_layout(showlegend=False, paper_bgcolor=CARD_BG,
-            height=280, margin=dict(l=20, r=20, t=10, b=10))
+        fmt_pie(fig2, height=300)
         st.plotly_chart(fig2, use_container_width=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -1177,10 +1194,7 @@ elif page == "Recommendation System":
                  for t in tc["Tier"]]
         fig2 = px.pie(tc, values="Count", names="Short", hole=0.5,
                       color_discrete_sequence=tcols)
-        fig2.update_traces(textposition="outside", textinfo="percent+label",
-                           textfont_size=12, marker=dict(line=dict(color=CARD_BG, width=2)))
-        fig2.update_layout(showlegend=False, paper_bgcolor=CARD_BG,
-            height=240, margin=dict(l=20, r=20, t=10, b=10))
+        fmt_pie(fig2, height=260)
         st.plotly_chart(fig2, use_container_width=True)
 
         create_section("Top 10 Priority SKUs")
