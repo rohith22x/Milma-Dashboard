@@ -226,47 +226,33 @@ st.markdown(f"""
   }}
   section[data-testid="stSidebar"] * {{ color: #CBD5E1 !important; }}
 
-  /* Style the radio as a clean nav list */
+  /* Radio nav styling */
   section[data-testid="stSidebar"] .stRadio > div {{
     gap: 2px !important;
-    display: flex;
-    flex-direction: column;
   }}
   section[data-testid="stSidebar"] .stRadio label {{
-    display: flex !important;
-    align-items: center !important;
     padding: 8px 12px !important;
     border-radius: 6px !important;
-    cursor: pointer !important;
-    font-size: .87em !important;
-    color: #94A3B8 !important;
+    font-size: .875em !important;
     margin: 0 4px !important;
+    cursor: pointer !important;
     transition: background .15s !important;
-    gap: 0 !important;
   }}
   section[data-testid="stSidebar"] .stRadio label:hover {{
     background: #1E293B !important;
-    color: #F1F5F9 !important;
   }}
   section[data-testid="stSidebar"] .stRadio label[data-checked="true"] {{
     background: #1E3A5F !important;
-    color: #93C5FD !important;
     font-weight: 600 !important;
   }}
-  /* Hide every form of the radio dot — covers all Streamlit versions */
-  section[data-testid="stSidebar"] .stRadio input[type="radio"] {{
-    display: none !important;
+  section[data-testid="stSidebar"] .stRadio label[data-checked="true"] p {{
+    color: #93C5FD !important;
   }}
-  section[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] {{
-    display: none !important;
-  }}
-  section[data-testid="stSidebar"] .stRadio div[role="radio"] {{
+  /* Hide only the circle dot, nothing else */
+  section[data-testid="stSidebar"] .stRadio label svg {{
     display: none !important;
   }}
   section[data-testid="stSidebar"] .stRadio label > div:first-child {{
-    display: none !important;
-  }}
-  section[data-testid="stSidebar"] .stRadio span[data-testid="stRadioOption"] > div {{
     display: none !important;
   }}
 
