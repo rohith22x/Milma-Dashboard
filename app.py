@@ -614,7 +614,8 @@ if page == "Portfolio Overview":
 
     # ── Row 2: 5-year trend area chart ───────────────────────
     create_section("5-Year Revenue Trend — All Categories")
-    monthly_all = master.groupby(["Date", "Category"])["Sales_Value"].sum().reset_index()
+    monthly_all = (master.groupby(["Category", pd.Grouper(key="Date", freq="MS")])["Sales_Value"]
+                   .sum().reset_index())
     fig_area = px.area(monthly_all, x="Date", y="Sales_Value",
                        color="Category", color_discrete_map=CATEGORY_COLORS)
     fig_area.update_traces(line=dict(width=1.5))
