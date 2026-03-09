@@ -197,7 +197,6 @@ def icon_arrow_up_right(size=16, color="currentColor"):
 # ── Sidebar nav page keys (no emoji) ─────────────────────────
 # We keep the radio value strings clean; icons are rendered separately.
 PAGE_KEYS = [
-    "Executive Summary",
     "Portfolio Overview",
     "EDA — Sales Trends",
     "Clustering Results",
@@ -207,16 +206,6 @@ PAGE_KEYS = [
     "Category Deep Dive",
 ]
 
-PAGE_ICONS = {
-    "Executive Summary":     icon_home,
-    "Portfolio Overview":    icon_bar_chart,
-    "EDA — Sales Trends":    icon_trending_up,
-    "Clustering Results":    icon_scatter,
-    "Forecasting Tournament":icon_trophy,
-    "Portfolio Risk":        icon_alert_triangle,
-    "Recommendation System": icon_list_checks,
-    "Category Deep Dive":    icon_search,
-}
 
 # ── CSS ───────────────────────────────────────────────────────
 st.markdown(f"""
@@ -237,37 +226,39 @@ st.markdown(f"""
   }}
   section[data-testid="stSidebar"] * {{ color: #CBD5E1 !important; }}
 
-  /* Nav row: relative container holding the visual face + the invisible button */
-  .nav-row {{ position: relative; }}
-
-  /* The visual label (icon + text) sits in normal flow */
-  .nav-face {{ border-radius: 6px; transition: background .15s; }}
-  .nav-row:hover .nav-face {{ background: #1E293B; }}
-
-  /* The st.button sits in the same row but is made invisible.
-     We pull it up by its own height so it overlaps the .nav-face above. */
-  section[data-testid="stSidebar"] .stButton {{
-    margin-top: -36px !important;   /* pull button up over the .nav-face div */
-    position: relative;
-    z-index: 2;
+  /* Style the radio as a clean nav list */
+  section[data-testid="stSidebar"] .stRadio > div {{
+    gap: 2px !important;
+    display: flex;
+    flex-direction: column;
   }}
-  section[data-testid="stSidebar"] .stButton button {{
-    background: transparent !important;
-    border: none !important;
-    color: transparent !important;
-    box-shadow: none !important;
-    height: 36px !important;
-    padding: 0 !important;
+  section[data-testid="stSidebar"] .stRadio label {{
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
     cursor: pointer !important;
-    width: 100% !important;
-    font-size: 1px !important;
+    font-size: .87em !important;
+    color: #94A3B8 !important;
+    margin: 0 4px !important;
+    transition: background .15s !important;
   }}
-  section[data-testid="stSidebar"] .stButton button:hover,
-  section[data-testid="stSidebar"] .stButton button:focus {{
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
+  section[data-testid="stSidebar"] .stRadio label:hover {{
+    background: #1E293B !important;
+    color: #F1F5F9 !important;
+  }}
+  section[data-testid="stSidebar"] .stRadio label[data-checked="true"],
+  section[data-testid="stSidebar"] .stRadio input:checked + div {{
+    background: #1E3A5F !important;
+    color: #93C5FD !important;
+    font-weight: 600 !important;
+  }}
+  /* Hide the radio circle dot */
+  section[data-testid="stSidebar"] .stRadio input[type="radio"] {{
+    display: none !important;
+  }}
+  section[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] {{
+    display: none !important;
   }}
 
   /* Header */
@@ -521,7 +512,7 @@ master, clusters, tournament, forecast, bi3, bi7, recsys = load_data()
 
 # ── Session state for navigation ─────────────────────────────
 if "page" not in st.session_state:
-    st.session_state.page = "Executive Summary"
+    st.session_state.page = "Portfolio Overview"
 
 # ── Sidebar ───────────────────────────────────────────────────
 with st.sidebar:
@@ -542,32 +533,7 @@ with st.sidebar:
     <hr style='border:none;border-top:1px solid #1E293B;margin:0 0 6px;'>
     """, unsafe_allow_html=True)
 
-    for key in PAGE_KEYS:
-        is_active   = (st.session_state.page == key)
-        icon_svg    = PAGE_ICONS[key](size=15, color="#93C5FD" if is_active else "#64748B")
-        label_color = "#93C5FD" if is_active else "#94A3B8"
-        bg          = "background:#1E3A5F;" if is_active else ""
-        fw          = "font-weight:600;" if is_active else ""
-
-        # Render the visual label (SVG + text) ABOVE the button in a relative container.
-        # CSS makes the button fill the container and sit on top (pointer-events),
-        # while the label div is overlaid visually but lets clicks pass through.
-        unique_id = key.replace(" ", "_").replace("—", "").replace("  ", "_")
-        st.markdown(f"""
-        <div class="nav-row" id="nav_{unique_id}"
-             style="position:relative;{bg}border-radius:6px;margin:1px 4px;">
-          <div class="nav-face" style="display:flex;align-items:center;gap:9px;
-               padding:8px 12px;pointer-events:none;position:relative;z-index:1;">
-            {icon_svg}
-            <span style="font-size:.87em;{label_color and f'color:{label_color};'}{fw}">
-              {key}
-            </span>
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("‎", key=f"nav_{key}", use_container_width=True):  # zero-width label
-            st.session_state.page = key
-            st.rerun()
+    page = st.radio("Navigation", PAGE_KEYS, label_visibility="collapsed")
 
     st.markdown("""
     <hr style='border:none;border-top:1px solid #1E293B;margin:10px 0;'>
@@ -582,18 +548,21 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-page = st.session_state.page
+
+
 
 
 # ══════════════════════════════════════════════════════════════
-# PAGE 0 — EXECUTIVE SUMMARY
+# PAGE 1 — PORTFOLIO OVERVIEW  (merged from Executive Summary)
 # ══════════════════════════════════════════════════════════════
-if page == "Executive Summary":
-    create_header("Executive Summary",
-        "MILMA Malabar · Demand Intelligence System · Key findings at a glance",
-        icon_fn=icon_home)
+if page == "Portfolio Overview":
+    create_header("Portfolio Overview",
+        "Malabar MILMA · Shelf Stable Dairy · 46 SKUs · 6 Categories · 2021–2025",
+        icon_fn=icon_bar_chart)
 
+    # ── Compute all metrics ───────────────────────────────────
     total_rev  = master["Sales_Value"].sum()
+    total_sku  = master["Product"].nunique()
     top3_share = bi3.nlargest(3, "Total_Revenue")["Revenue_Share_Pct"].sum()
     ghee_share = bi3[bi3["Category"] == "Ghee"]["Revenue_Share_Pct"].sum()
     growing    = len(bi7[bi7["Recovery_Status"] == "GROWING"])
@@ -601,56 +570,68 @@ if page == "Executive Summary":
     best_mape  = tournament["Champion_MAPE"].min()
     t1_count   = len(recsys[recsys["Planning_Tier"].str.contains("TIER 1", na=False)])
 
-    c1, c2, c3, c4 = st.columns(4)
-    c1.markdown(create_kpi(f"₹{total_rev/1e9:.2f}B", "5-Year Total Revenue", "2021–2025"), unsafe_allow_html=True)
-    c2.markdown(create_kpi("46 SKUs", "Active Products", "6 categories"), unsafe_allow_html=True)
-    c3.markdown(create_kpi("XGBoost", "Forecast Champion", "5 of 6 category wins"), unsafe_allow_html=True)
-    c4.markdown(create_kpi(f"{t1_count} SKUs", "Algorithm-Ready Forecasts", "MAPE < 30%"), unsafe_allow_html=True)
+    # ── KPI row ───────────────────────────────────────────────
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
+    c1.markdown(create_kpi(f"₹{total_rev/1e9:.2f}B", "5-Year Revenue",      "2021–2025"),          unsafe_allow_html=True)
+    c2.markdown(create_kpi(str(total_sku),            "Active SKUs",         "6 categories"),       unsafe_allow_html=True)
+    c3.markdown(create_kpi(f"{top3_share:.1f}%",      "Top 3 SKU Share",     "Concentration risk"), unsafe_allow_html=True)
+    c4.markdown(create_kpi(f"{best_mape:.1f}%",       "Best Forecast MAPE",  "Ghee · XGBoost"),     unsafe_allow_html=True)
+    c5.markdown(create_kpi(str(growing),              "Growing SKUs",        "At all-time peak"),   unsafe_allow_html=True)
+    c6.markdown(create_kpi(str(disrupted),            "Disrupted SKUs",      "Below peak revenue"), unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    k1, k2, k3, k4, k5, k6 = st.columns(6)
-    k1.markdown(create_kpi(f"{top3_share:.1f}%", "Top 3 SKU Share", "Extreme concentration"), unsafe_allow_html=True)
-    k2.markdown(create_kpi(f"{ghee_share:.1f}%", "Ghee Dominance", "HHI = 0.1516"), unsafe_allow_html=True)
-    k3.markdown(create_kpi(f"{best_mape:.1f}%", "Best MAPE", "Ghee — Excellent"), unsafe_allow_html=True)
-    k4.markdown(create_kpi("0.61", "Silhouette Score", "K-Means quality"), unsafe_allow_html=True)
-    k5.markdown(create_kpi(str(growing), "Growing SKUs", "At all-time peak"), unsafe_allow_html=True)
-    k6.markdown(create_kpi(str(disrupted), "Disrupted SKUs", "Need strategic review"), unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    col1, col2 = st.columns([3, 2], gap="large")
+    # ── Row 1: Revenue pie + Top SKUs bar ────────────────────
+    col1, col2 = st.columns(2, gap="large")
 
     with col1:
-        create_section("5-Year Revenue Trend — All Categories")
-        monthly_all = master.groupby(["Date", "Category"])["Sales_Value"].sum().reset_index()
-        fig = px.area(monthly_all, x="Date", y="Sales_Value",
-                      color="Category", color_discrete_map=CATEGORY_COLORS)
-        fig.update_traces(line=dict(width=1.5))
-        chart_fmt(fig, height=320)
-        fig.update_layout(xaxis_title="", yaxis_title="Monthly Revenue (₹)",
-                          legend=dict(orientation="h", y=-0.2, x=0))
+        create_section("Revenue Distribution by Category")
+        cat_rev = master.groupby("Category")["Sales_Value"].sum().reset_index()
+        fig = px.pie(cat_rev, values="Sales_Value", names="Category", hole=0.55,
+                     color="Category", color_discrete_map=CATEGORY_COLORS)
+        fmt_pie(fig, height=320, center_text=f"<b>₹{total_rev/1e9:.2f}B</b><br>Total")
         st.plotly_chart(fig, use_container_width=True)
 
     with col2:
-        create_section("Critical Findings")
-        create_insight(
-            "Concentration Risk",
-            f"3 SKUs = <b>{top3_share:.1f}%</b> of revenue. "
-            "Zero stockout tolerance on Ghee 500ml, 15kg Tin, 200ml Pet.",
-            style="danger", icon_fn=icon_alert_triangle, icon_color=DANGER)
-        create_insight(
-            "Festival Dependency",
-            "Ghee and Palada spike <b>2–5×</b> during Onam (Aug) and Vishu (Apr). "
-            "Surge stock 6 weeks before.",
-            style="warning", icon_fn=icon_calendar, icon_color=WARNING)
-        create_insight(
-            "Forecast Reliability",
-            f"<b>{t1_count} SKUs</b> have reliable forecasts (MAPE &lt;30%). "
-            "Ghee 12%, Palada 19%. Use directly for procurement.",
-            style="success", icon_fn=icon_check_circle, icon_color=SUCCESS)
+        create_section("Top 10 SKUs by Revenue")
+        top10 = bi3.nlargest(10, "Total_Revenue").copy().sort_values("Total_Revenue")
+        bc = [DANGER if f == "CRITICAL" else WARNING if f == "HIGH" else PRIMARY
+              for f in top10["Concentration_Flag"]]
+        fig2 = go.Figure(go.Bar(
+            x=top10["Total_Revenue"], y=top10["Product"], orientation="h",
+            marker_color=bc, marker_line_width=0,
+            text=[f"₹{v/1e6:.0f}M" for v in top10["Total_Revenue"]],
+            textposition="outside", textfont=dict(size=11, color=TEXT_PRIMARY)))
+        chart_fmt(fig2, height=320, show_legend=False)
+        fig2.update_layout(xaxis_title="Total Revenue (₹)",
+                           yaxis=dict(tickfont=dict(size=10)),
+                           margin=dict(l=10, r=70, t=10, b=10))
+        st.plotly_chart(fig2, use_container_width=True)
+
+    st.markdown(
+        f"<div style='font-size:.8em;color:{TEXT_SECONDARY};margin:-4px 0 14px;'>"
+        f"<span style='color:{DANGER};font-weight:600;'>■ CRITICAL</span> &nbsp;"
+        f"<span style='color:{WARNING};font-weight:600;'>■ HIGH</span> &nbsp;"
+        f"<span style='color:{PRIMARY};font-weight:600;'>■ STANDARD</span>"
+        f" &nbsp;concentration flag</div>", unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
-    create_section("Three-Step Methodology")
+
+    # ── Row 2: 5-year trend area chart ───────────────────────
+    create_section("5-Year Revenue Trend — All Categories")
+    monthly_all = master.groupby(["Date", "Category"])["Sales_Value"].sum().reset_index()
+    fig_area = px.area(monthly_all, x="Date", y="Sales_Value",
+                       color="Category", color_discrete_map=CATEGORY_COLORS)
+    fig_area.update_traces(line=dict(width=1.5))
+    chart_fmt(fig_area, height=300)
+    fig_area.update_layout(xaxis_title="", yaxis_title="Monthly Revenue (₹)",
+                           legend=dict(orientation="h", y=-0.2, x=0))
+    st.plotly_chart(fig_area, use_container_width=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ── Row 3: Methodology steps ─────────────────────────────
+    create_section("Analytical Methodology")
     m1, m2, m3 = st.columns(3)
     with m1:
         st.markdown(create_step_card(
@@ -671,78 +652,25 @@ if page == "Executive Summary":
             "forecast quality, HHI, and recovery status.<br><b>42 SKUs covered</b>",
             icon_color=SUCCESS, bg="#F0FDF4"), unsafe_allow_html=True)
 
-
-# ══════════════════════════════════════════════════════════════
-# PAGE 1 — PORTFOLIO OVERVIEW
-# ══════════════════════════════════════════════════════════════
-elif page == "Portfolio Overview":
-    create_header("Portfolio Overview",
-        "Malabar MILMA · Shelf Stable Dairy · 2021–2025",
-        icon_fn=icon_bar_chart)
-
-    total_rev  = master["Sales_Value"].sum()
-    total_sku  = master["Product"].nunique()
-    top3_share = bi3.nlargest(3, "Total_Revenue")["Revenue_Share_Pct"].sum()
-    ghee_share = bi3[bi3["Category"] == "Ghee"]["Revenue_Share_Pct"].sum()
-
-    c1, c2, c3, c4 = st.columns(4)
-    c1.markdown(create_kpi(f"₹{total_rev/1e9:.2f}B", "Total Portfolio Revenue", "5-year 2021–2025"), unsafe_allow_html=True)
-    c2.markdown(create_kpi(str(total_sku), "Total Active SKUs", "6 categories"), unsafe_allow_html=True)
-    c3.markdown(create_kpi(f"{top3_share:.1f}%", "Top 3 SKUs Revenue Share", "Extreme concentration"), unsafe_allow_html=True)
-    c4.markdown(create_kpi(f"{ghee_share:.1f}%", "Ghee Category Dominance", "HHI = 0.1516"), unsafe_allow_html=True)
-
     st.markdown("<br>", unsafe_allow_html=True)
-    col1, col2 = st.columns(2, gap="large")
 
-    with col1:
-        create_section("Revenue Distribution by Category")
-        cat_rev = master.groupby("Category")["Sales_Value"].sum().reset_index()
-        fig = px.pie(cat_rev, values="Sales_Value", names="Category", hole=0.55,
-                     color="Category", color_discrete_map=CATEGORY_COLORS)
-        fmt_pie(fig, height=340,
-                center_text=f"<b>₹{total_rev/1e9:.2f}B</b><br>Total")
-        st.plotly_chart(fig, use_container_width=True)
-
-    with col2:
-        create_section("Top 10 SKUs by Revenue")
-        top10 = bi3.nlargest(10, "Total_Revenue").copy().sort_values("Total_Revenue")
-        bc = [DANGER if f == "CRITICAL" else WARNING if f == "HIGH" else PRIMARY
-              for f in top10["Concentration_Flag"]]
-        fig2 = go.Figure(go.Bar(
-            x=top10["Total_Revenue"], y=top10["Product"], orientation="h",
-            marker_color=bc, marker_line_width=0,
-            text=[f"₹{v/1e6:.0f}M" for v in top10["Total_Revenue"]],
-            textposition="outside", textfont=dict(size=11, color=TEXT_PRIMARY)))
-        chart_fmt(fig2, height=340, show_legend=False)
-        fig2.update_layout(xaxis_title="Total Revenue (₹)",
-                           yaxis=dict(tickfont=dict(size=10)),
-                           margin=dict(l=10, r=70, t=10, b=10))
-        st.plotly_chart(fig2, use_container_width=True)
-
-    st.markdown(
-        f"<div style='font-size:.8em;color:{TEXT_SECONDARY};margin:-4px 0 14px;'>"
-        f"<span style='color:{DANGER};font-weight:600;'>■ CRITICAL</span> &nbsp;"
-        f"<span style='color:{WARNING};font-weight:600;'>■ HIGH</span> &nbsp;"
-        f"<span style='color:{PRIMARY};font-weight:600;'>■ STANDARD</span>"
-        f" &nbsp;concentration flag</div>", unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
+    # ── Row 4: Key findings ───────────────────────────────────
     create_section("Key Findings")
     r1, r2, r3 = st.columns(3)
     with r1:
-        create_insight("Extreme Concentration",
-            "3 SKUs generate <b>60%</b> of total revenue. "
-            "Any Ghee supply disruption is a business-level risk.",
+        create_insight("Concentration Risk",
+            f"3 SKUs = <b>{top3_share:.1f}%</b> of revenue. "
+            "Zero stockout tolerance on Ghee 500ml, 15kg Tin, 200ml Pet.",
             style="danger", icon_fn=icon_alert_triangle, icon_color=DANGER)
     with r2:
         create_insight("Festival Dependency",
-            "Ghee and Palada show <b>2–5× revenue spikes</b> "
-            "during Onam (Aug) and Vishu (Apr).",
+            "Ghee and Palada spike <b>2–5×</b> during Onam (Aug) and Vishu (Apr). "
+            "Surge stock 6 weeks before.",
             style="warning", icon_fn=icon_calendar, icon_color=WARNING)
     with r3:
         create_insight("Growth Signal",
-            "<b>17 SKUs</b> at all-time revenue peaks. "
-            "Butter and Milk Powder strongest growth in 2025.",
+            f"<b>{t1_count} SKUs</b> have reliable forecasts (MAPE &lt;30%). "
+            "17 SKUs at all-time revenue peaks in 2025.",
             style="success", icon_fn=icon_arrow_up_right, icon_color=SUCCESS)
 
 
@@ -818,15 +746,23 @@ elif page == "EDA — Sales Trends":
         heat = master.groupby(["Category", "Month_No"])["Sales_Value"].mean().reset_index()
         hp   = heat.pivot(index="Category", columns="Month_No", values="Sales_Value")
         mn   = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+        # Normalize each row so colour shows relative peak within each category
+        hp_norm = hp.div(hp.max(axis=1), axis=0)
         fig2 = go.Figure(go.Heatmap(
-            z=hp.values, x=mn, y=hp.index.tolist(),
-            colorscale=[[0, "#EFF6FF"], [0.5, "#93C5FD"], [1, "#1D4ED8"]],
+            z=hp_norm.values,
+            x=mn, y=hp.index.tolist(),
+            customdata=hp.values,
+            colorscale=[[0, "#EFF6FF"], [0.4, "#60A5FA"], [1, "#1E40AF"]],
+            hovertemplate="%{y} · %{x}<br>₹%{customdata:,.0f}<extra></extra>",
             text=[[f"₹{v/1e6:.1f}M" for v in row] for row in hp.values],
-            texttemplate="%{text}", textfont=dict(size=9, color=CARD_BG),
+            texttemplate="%{text}",
+            textfont=dict(size=9, color=TEXT_PRIMARY),
             showscale=False))
-        fig2.update_layout(paper_bgcolor=CARD_BG, plot_bgcolor=CARD_BG,
-            height=280, margin=dict(l=10, r=10, t=10, b=10),
-            xaxis=dict(tickfont=dict(size=11)), yaxis=dict(tickfont=dict(size=11)))
+        fig2.update_layout(
+            paper_bgcolor=CARD_BG, plot_bgcolor=CARD_BG,
+            height=300, margin=dict(l=10, r=10, t=10, b=10),
+            xaxis=dict(tickfont=dict(size=11), side="bottom"),
+            yaxis=dict(tickfont=dict(size=11)))
         st.plotly_chart(fig2, use_container_width=True)
 
     with col2:
@@ -846,21 +782,35 @@ elif page == "EDA — Sales Trends":
     yoy["YoY"] = yoy.groupby("Category")["Sales_Value"].pct_change() * 100
     yp = yoy.pivot(index="Category", columns="Year", values="YoY").round(1)
     fig4 = go.Figure(go.Heatmap(
-        z=yp.values, x=[str(y) for y in yp.columns], y=yp.index.tolist(),
-        colorscale=[[0, "#FEF2F2"], [0.5, "#F9FAFB"], [1, "#F0FDF4"]],
+        z=yp.values,
+        x=[str(y) for y in yp.columns],
+        y=yp.index.tolist(),
+        colorscale=[
+            [0,   "#DC2626"],   # strong red  — big decline
+            [0.4, "#FCA5A5"],   # light red
+            [0.5, "#F9FAFB"],   # neutral
+            [0.6, "#86EFAC"],   # light green
+            [1,   "#16A34A"],   # strong green — big growth
+        ],
         zmid=0,
-        text=[[f"{v:+.1f}%" if not np.isnan(v) else "—" for v in row] for row in yp.values],
-        texttemplate="%{text}", textfont=dict(size=12, color=TEXT_PRIMARY),
-        showscale=False))
-    fig4.update_layout(paper_bgcolor=CARD_BG, plot_bgcolor=CARD_BG,
-        height=240, margin=dict(l=10, r=10, t=10, b=10),
-        xaxis=dict(tickfont=dict(size=12)), yaxis=dict(tickfont=dict(size=12)))
+        zmin=-60, zmax=60,
+        text=[[f"{v:+.0f}%" if not np.isnan(v) else "—" for v in row] for row in yp.values],
+        texttemplate="%{text}",
+        textfont=dict(size=12, color=TEXT_PRIMARY),
+        showscale=True,
+        colorbar=dict(
+            thickness=12, len=0.8,
+            tickfont=dict(size=10, color=TEXT_SECONDARY),
+            outlinewidth=0)))
+    fig4.update_layout(
+        paper_bgcolor=CARD_BG, plot_bgcolor=CARD_BG,
+        height=260, margin=dict(l=10, r=60, t=10, b=10),
+        xaxis=dict(tickfont=dict(size=12), side="bottom"),
+        yaxis=dict(tickfont=dict(size=12)))
     st.plotly_chart(fig4, use_container_width=True)
     create_insight("",
-        "Green cells = revenue growth vs prior year · "
-        "Red cells = revenue decline · "
-        "UHT Milk shows red from 2022 onwards · "
-        "Butter and Milk Powder bright green in 2025",
+        "Green = growth vs prior year · Red = decline · "
+        "UHT Milk declining from 2022 · Butter and Milk Powder strong in 2025",
         icon_fn=icon_info, icon_color=TEXT_SECONDARY)
 
 
@@ -1378,4 +1328,3 @@ elif page == "Category Deep Dive":
                            yaxis=dict(tickfont=dict(size=10)),
                            margin=dict(l=10, r=70, t=10, b=10))
         st.plotly_chart(fig3, use_container_width=True)
-
