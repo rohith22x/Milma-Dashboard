@@ -242,22 +242,31 @@ st.markdown(f"""
     color: #94A3B8 !important;
     margin: 0 4px !important;
     transition: background .15s !important;
+    gap: 0 !important;
   }}
   section[data-testid="stSidebar"] .stRadio label:hover {{
     background: #1E293B !important;
     color: #F1F5F9 !important;
   }}
-  section[data-testid="stSidebar"] .stRadio label[data-checked="true"],
-  section[data-testid="stSidebar"] .stRadio input:checked + div {{
+  section[data-testid="stSidebar"] .stRadio label[data-checked="true"] {{
     background: #1E3A5F !important;
     color: #93C5FD !important;
     font-weight: 600 !important;
   }}
-  /* Hide the radio circle dot */
+  /* Hide every form of the radio dot — covers all Streamlit versions */
   section[data-testid="stSidebar"] .stRadio input[type="radio"] {{
     display: none !important;
   }}
   section[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] {{
+    display: none !important;
+  }}
+  section[data-testid="stSidebar"] .stRadio div[role="radio"] {{
+    display: none !important;
+  }}
+  section[data-testid="stSidebar"] .stRadio label > div:first-child {{
+    display: none !important;
+  }}
+  section[data-testid="stSidebar"] .stRadio span[data-testid="stRadioOption"] > div {{
     display: none !important;
   }}
 
